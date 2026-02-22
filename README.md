@@ -3,62 +3,77 @@
 
 ## Descrizione
 `ai-backoffice-agent-demo` è una **demo applicativa indipendente** che mostra come un
-**agente di backoffice** possa:
+**agente di backoffice basato su AI** possa supportare attività operative reali
+(ticketing, CRM, preventivi), **senza eseguire azioni automatiche sul mondo esterno**.
 
-- analizzare ticket multi-canale  
-- correlare dati CRM  
-- classificare e prioritizzare richieste  
-- proporre azioni operative  
-- generare bozze di preventivo  
-- produrre **log e audit verificabili**
-
-👉 Tutto avviene **senza eseguire azioni reali** (email, messaggi, modifiche esterne).
-
-Il progetto gira **interamente in locale nel browser**, senza backend e senza dipendenze esterne.
+L’applicazione gira **interamente in locale nel browser**, senza backend e senza
+dipendenze esterne.
 
 ---
 
-## Cosa NON è
-- ❌ non è un assistente autonomo in produzione  
-- ❌ non invia email o messaggi reali  
-- ❌ non accede a sistemi esterni  
-- ❌ non sostituisce persone  
+## Cosa sono gli *AI Agent* (in breve)
+Un **AI Agent** non è una “persona digitale” né un sistema autonomo nel senso umano.
 
-È una **demo tecnica** per comprendere **processi e rischi** dei sistemi agentici.
+In termini tecnici, un agente AI è:
+- un **processo software**
+- che osserva uno stato (input)
+- applica regole e modelli di ragionamento
+- **propone decisioni o azioni**
+- registra ciò che fa (audit)
 
----
-
-## Concetto chiave
-L’agente segue una pipeline esplicita:
+Uno schema tipico è:
 
 ```
 observe → decide → propose → guardrail → audit
 ```
 
-- **observe**: legge input strutturati (CSV demo)  
-- **decide**: classifica e assegna priorità  
-- **propose**: suggerisce azioni (mai eseguite)  
-- **guardrail**: applica policy (approvazione umana, blocchi)  
-- **audit**: registra tutto in modo tracciabile  
+Il punto chiave è che **l’agente non deve eseguire automaticamente le azioni critiche**:
+la separazione tra *proposta* ed *esecuzione* è ciò che rende il sistema sicuro e governabile.
 
 ---
 
-## Contesto
-Questo progetto è **concettualmente ispirato** al dibattito sui framework di
-**agenti AI autonomi** (talvolta indicati con nomi come *OpenClaw* nei media).
+## Cosa fa questa demo
+Questa demo mostra un agente che può:
 
-👉 **Non utilizza codice, librerie o componenti di tali framework**.  
-👉 Ogni riferimento è **solo esplicativo**, per contestualizzare il problema.
+- analizzare ticket multi‑canale (email, chat, CRM)
+- correlare i ticket con dati CRM
+- classificare e assegnare priorità (P0 / P1 / P2)
+- proporre azioni operative (mai eseguite)
+- generare **bozze di preventivo**
+- produrre **log e audit verificabili**
 
-Lo scopo è **mostrare in modo concreto**:
-- cosa è tecnicamente possibile oggi  
-- dove nascono i rischi reali  
-- perché i guardrail sono più importanti del modello AI  
+👉 Tutte le azioni sono **simulate**.  
+👉 Nessuna email, messaggio o modifica reale viene eseguita.
+
+---
+
+## Cosa NON è
+- ❌ non è un assistente autonomo in produzione  
+- ❌ non sostituisce persone  
+- ❌ non prende decisioni irreversibili  
+- ❌ non accede a sistemi esterni  
+
+È una **demo tecnica e concettuale** per capire **come funzionano davvero gli agenti AI**.
+
+---
+
+## Contesto e riferimenti
+Questo progetto è **concettualmente ispirato** al dibattito recente sui
+**framework di agenti AI** (talvolta citati nei media con nomi come *OpenClaw*).
+
+👉 **Questo repository NON utilizza codice, librerie o componenti di tali framework.**  
+👉 Il riferimento è **puramente concettuale ed educativo**.
+
+Per chi vuole approfondire il tema degli agenti AI come framework software:
+- OpenClaw (repository pubblico):  
+  https://github.com/openclaw/openclaw
+
+*(Il link è fornito come riferimento informativo, non come dipendenza tecnica.)*
 
 ---
 
 ## Dataset demo inclusi
-- `demo_tickets.csv` – richieste multi-canale  
+- `demo_tickets.csv` – richieste multi‑canale  
 - `demo_customers.csv` – clienti CRM  
 - `demo_products.csv` – prodotti e prezzi  
 - `demo_deals.csv` – opportunità commerciali  
@@ -68,10 +83,10 @@ I dati sono **fittizi** e usati solo a scopo dimostrativo.
 ---
 
 ## Guardrail implementati
-- blocco azioni esterne (default ON)  
-- approvazione umana obbligatoria per priorità P0  
-- mascheramento dati sensibili (PII)  
-- separazione chiara tra *proposta* ed *esecuzione*  
+- blocco azioni esterne (default ON)
+- approvazione umana obbligatoria per ticket critici (P0)
+- mascheramento dati sensibili (PII)
+- separazione netta tra **proposta** ed **esecuzione**
 
 ---
 
@@ -93,12 +108,12 @@ python3 -m http.server 8000
 
 ## Perché esiste questo progetto
 Questo repository serve a:
-- **capire**, non a spaventare  
-- **testare concetti**, non sostituire persone  
-- **rendere visibile il rischio**, non nasconderlo  
+- rendere **concreti** concetti spesso raccontati in modo astratto
+- distinguere **possibilità reali** da hype mediatico
+- mostrare che il rischio non è l’AI, ma **l’automazione senza controllo**
 
-Il vero rischio degli agenti AI **non è l’intelligenza**,  
-ma **l’automazione non governata delle azioni**.
+Il vero valore di un agente AI non è fare tutto da solo,  
+ma **sapere quando fermarsi**.
 
 ---
 
@@ -106,4 +121,4 @@ ma **l’automazione non governata delle azioni**.
 MIT
 
 > *Un buon agente non è quello che fa di più,  
-> ma quello che sa quando fermarsi.*
+> ma quello che rende visibili le decisioni.*
