@@ -1,0 +1,6 @@
+ticket_id,channel,customer_hint,subject,body,date
+T001,email,"mario.rossi@email.com","Fermo impianto urgente","Produzione ferma. Errore crash, non funziona. Urgenza massima entro oggi.",2026-02-22
+T002,whatsapp,"AutoService Bianchi","Richiesta preventivo","Mi serve un preventivo per BASIC 224, vorrei sconto su 5 pezzi e consegna rapida.",2026-02-22
+T003,email,"Studio Legale","Diffida","Se non rispondete entro domani procederemo con diffida formale e denuncia.",2026-02-22
+T004,crm,"Trasporti Delta","Fattura e scadenza","Manca la fattura e dobbiamo chiudere pagamento oggi. Serve verifica scadenze.",2026-02-21
+T005,chat,"Ente Pubblico Zeta","Documentazione","Serve dichiarazione configurazione e documenti per procedere con ordine.",2026-02-21

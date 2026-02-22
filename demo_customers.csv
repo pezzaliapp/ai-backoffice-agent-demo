@@ -1,0 +1,5 @@
+customer_id,company,contact,email,phone,city,segment
+C001,Officina Rossi,Mario Rossi,mario.rossi@email.com,+39 347 1112233,Milano,SMB
+C002,AutoService Bianchi,Luca Bianchi,luca@autoservice.it,+39 333 9876543,Bologna,SMB
+C003,Trasporti Delta,Giuseppe Di Mauro,giuseppe@delta.it,+39 347 6890622,Genova,Enterprise
+C004,Ente Pubblico Zeta,Ufficio Acquisti,acquisti@zeta.gov,+39 02 555000,Roma,Public

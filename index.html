@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Backoffice Agent Demo</title>
+  <style>
+    :root { --bd:#e6e6e6; --muted:#6b6b6b; }
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:18px;max-width:1200px}
+    h1{margin:0 0 6px}
+    .muted{color:var(--muted);font-size:12px}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+    .card{border:1px solid var(--bd);border-radius:12px;padding:14px;flex:1;min-width:300px;background:#fff}
+    .tabs{display:flex;gap:8px;margin:14px 0 10px;flex-wrap:wrap}
+    .tab{border:1px solid var(--bd);padding:8px 10px;border-radius:999px;cursor:pointer;background:#fff}
+    .tab.active{border-color:#999}
+    .panel{display:none}
+    .panel.active{display:block}
+    button{padding:9px 11px;border-radius:10px;border:1px solid var(--bd);background:#fff;cursor:pointer}
+    button:hover{background:#f7f7f7}
+    button.primary{border-color:#999}
+    input[type=file]{display:block}
+    label{display:block;margin:6px 0}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{border-bottom:1px solid #f0f0f0;padding:8px;vertical-align:top;text-align:left}
+    th{font-size:12px;color:var(--muted);font-weight:600}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px}
+    .pill{display:inline-block;border:1px solid var(--bd);border-radius:999px;padding:2px 8px;font-size:12px;margin-right:6px}
+    .p0{border-color:#c33}
+    .p1{border-color:#c90}
+    .p2{border-color:#3a3}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    details > summary{cursor:pointer;color:#333}
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width: 900px){ .split{grid-template-columns:1fr} }
+    .kpi{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .kpi .pill{background:#fafafa}
+    .inline{display:inline-flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .hr{height:1px;background:#f0f0f0;margin:12px 0}
+    textarea{width:100%;min-height:120px;border:1px solid var(--bd);border-radius:10px;padding:10px}
+  </style>
+</head>
+<body>
+  <h1>AI Backoffice Agent Demo</h1>
+  <div class="muted">
+    Demo locale (browser-only). Simula un agente backoffice: <b>observe → decide → propose actions → log/audit</b>.
+    Nessuna azione esterna reale (email/WhatsApp) viene eseguita.
+  </div>
+
+  <div class="row" style="margin-top:12px">
+    <div class="card">
+      <h3 style="margin:0 0 8px">Dati (CSV)</h3>
+
+      <div class="split">
+        <div>
+          <label class="muted">Ticket (demo_tickets.csv)</label>
+          <input id="fileTickets" type="file" accept=".csv" />
+        </div>
+        <div>
+          <label class="muted">Clienti (demo_customers.csv)</label>
+          <input id="fileCustomers" type="file" accept=".csv" />
+        </div>
+        <div>
+          <label class="muted">Prodotti (demo_products.csv)</label>
+          <input id="fileProducts" type="file" accept=".csv" />
+        </div>
+        <div>
+          <label class="muted">Opportunità (demo_deals.csv)</label>
+          <input id="fileDeals" type="file" accept=".csv" />
+        </div>
+      </div>
+
+      <div class="hr"></div>
+      <div class="actions">
+        <button id="loadDemo" class="primary">Carica dataset demo</button>
+        <button id="clearAll">Svuota</button>
+      </div>
+      <div id="dataStatus" class="muted" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px">Policy / Guardrail</h3>
+      <label><input id="polBlockExternal" type="checkbox" checked> Blocca azioni esterne (email/WhatsApp) — demo safe</label>
+      <label><input id="polRequireHumanP0" type="checkbox" checked> Richiedi approvazione umana per ticket P0</label>
+      <label><input id="polMaskPII" type="checkbox" checked> Maschera PII (tel/email) in output / report</label>
+      <label><input id="polAutoQuote" type="checkbox" checked> Genera bozza preventivo quando rilevato “commerciale”</label>
+
+      <div class="hr"></div>
+      <div class="actions">
+        <button id="runAgent" class="primary">Esegui agente</button>
+        <button id="exportReport">Esporta report JSON</button>
+      </div>
+      <div id="runStatus" class="muted" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="tickets">Tickets</button>
+    <button class="tab" data-tab="crm">CRM</button>
+    <button class="tab" data-tab="quotes">Preventivi</button>
+    <button class="tab" data-tab="audit">Audit</button>
+  </div>
+
+  <!-- Tickets -->
+  <div id="panel-tickets" class="panel active card">
+    <div class="inline">
+      <h3 style="margin:0">Tickets (triage)</h3>
+      <span class="muted">Classificazione, priorità, azione proposta, approvazione P0</span>
+    </div>
+
+    <div id="kpiTickets" class="kpi"></div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Canale</th>
+          <th>Cliente (match)</th>
+          <th>Categoria</th>
+          <th>Priorità</th>
+          <th>Azione proposta</th>
+          <th>Motivo</th>
+          <th>Operazioni</th>
+        </tr>
+      </thead>
+      <tbody id="ticketsBody"></tbody>
+    </table>
+  </div>
+
+  <!-- CRM -->
+  <div id="panel-crm" class="panel card">
+    <div class="inline">
+      <h3 style="margin:0">CRM (clienti + opportunità)</h3>
+      <span class="muted">Vista clienti + opportunità demo</span>
+    </div>
+
+    <div class="split" style="margin-top:10px">
+      <div>
+        <h4 style="margin:0 0 6px">Clienti</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Azienda</th><th>Contatto</th><th>Email</th><th>Telefono</th><th>Città</th><th>Segmento</th>
+            </tr>
+          </thead>
+          <tbody id="customersBody"></tbody>
+        </table>
+      </div>
+
+      <div>
+        <h4 style="margin:0 0 6px">Opportunità (Deals)</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Cliente</th><th>Stage</th><th>Valore atteso</th><th>Note</th>
+            </tr>
+          </thead>
+          <tbody id="dealsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quotes -->
+  <div id="panel-quotes" class="panel card">
+    <div class="inline">
+      <h3 style="margin:0">Preventivi (bozze)</h3>
+      <span class="muted">Generati dall’agente (demo). Nessun invio reale.</span>
+    </div>
+
+    <div id="quotesEmpty" class="muted" style="margin-top:8px; display:none">
+      Nessuna bozza preventivo. Carica dati + esegui agente, oppure crea una bozza da ticket commerciale.
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Quote ID</th>
+          <th>Da ticket</th>
+          <th>Cliente</th>
+          <th>Righe</th>
+          <th>Totale netto</th>
+          <th>Note</th>
+          <th>Export</th>
+        </tr>
+      </thead>
+      <tbody id="quotesBody"></tbody>
+    </table>
+
+    <div class="hr"></div>
+    <h4 style="margin:0 0 6px">Dettaglio bozza (seleziona una riga sopra)</h4>
+    <div id="quoteDetail" class="muted">Seleziona una bozza per vedere le righe prodotto.</div>
+  </div>
+
+  <!-- Audit -->
+  <div id="panel-audit" class="panel card">
+    <div class="inline">
+      <h3 style="margin:0">Audit / Log</h3>
+      <span class="muted">Black box: motivazioni + timeline per ticket</span>
+    </div>
+    <div class="muted" style="margin-top:8px">
+      Seleziona un ticket nella tab “Tickets” e apri i dettagli “log”.
+    </div>
+
+    <div class="hr"></div>
+    <h4 style="margin:0 0 6px">Report JSON (preview)</h4>
+    <textarea id="reportPreview" readonly placeholder="Esegui l’agente per generare il report..."></textarea>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+deal_id,customer_id,stage,expected_value,notes
+D001,C002,Qualified,4500,"Interessati a BASIC 224 + accessori"
+D002,C003,Proposal,2750,"Richiesta accessori gonfiaggio + scheda tecnica"
+D003,C004,Negotiation,12000,"Richiesta documentazione e conformità"
